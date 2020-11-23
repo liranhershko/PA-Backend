@@ -1,0 +1,48 @@
+version: "3.1"
+
+services:
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 9000:8080
+  #   environment:
+  #     # for some reason this could not be `mysql_db_container`
+  #     # as I initially wanted to call the db service with that name
+  #     ADMINER_DEFAULT_SERVER: mysql_db
+
+  mysql_db:
+    image: mysql
+    restart: always
+    # mysql v8 image should have this in order to work
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    # we can set an env file to include all the env vars
+    # here I am setting it locally on the docker-compose file
+    # env_file:
+    # - ./config/mysql.env
+    environment:
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: liran
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: roottpassword
+    volumes:
+      # I had to create `/tmp/app/mysqld` folder locally first
+      - /tmp/app/mysqld:/var/run/mysqld
+    #   - ./db:/var/lib/mysql
+
+  django-app:
+    restart: always
+    # look in the current directory and build the container from the Dockerfile
+    build: .
+    # volumes:
+    #   - .:/usr/src/app
+    #   - /tmp/app/mysqld:/run/mysqld
+    ports:
+      # [port on the local machine]:[port in the container]
+      # this is only to expose the port for access on the local machine
+      # the networking between the two services is done automatically
+      - "8000:8000"
+    depends_on:
+      - mysql_db
