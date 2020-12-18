@@ -18,10 +18,11 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-COPY ./ ./
-
 # this is so ew can wait for the mysql db to be "ready"
 RUN apt-get -q update && apt-get -qy install netcat
+
+COPY ./ ./
+
 RUN ["chmod", "+x", "/usr/src/app/wait-for.sh"]
-# CMD [ "python", "./mysite/manage.py", "runserver", "0.0.0.0:8000" ]
+
 CMD ["./wait-for.sh", "mysql_db:3306", "--", "python", "./mysite/manage.py", "runserver", "0.0.0.0:8000"]
