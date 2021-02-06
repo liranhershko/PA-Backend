@@ -20,4 +20,5 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY ./ ./
 
-# CMD ["./wait-for.sh", "mysql_db:3306", "--", "python", "./mysite/manage.py", "runserver", "0.0.0.0:8000"]
+RUN ["chmod", "+x", "/usr/src/app/docker-entrypoint.sh"]
+ENTRYPOINT [ "./docker-entrypoint.sh" ]
